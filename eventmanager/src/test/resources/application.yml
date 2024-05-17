@@ -1,0 +1,4 @@
+spring:
+  flyway:
+    user: usr
+    password: pwd

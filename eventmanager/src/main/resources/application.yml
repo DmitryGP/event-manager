@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5430/event_manager
+    username: usr
+    password: pwd
+    initialization-mode: never
+  flyway:
+    url: jdbc:postgresql://localhost:5430/event_manager
+    user: usr
+    password: pwd
+
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+
+    properties:
+      hibernate:
+        format_sql: true
+
+    show-sql: true
+
+
+logging:
+  level:
+    ROOT: ERROR
