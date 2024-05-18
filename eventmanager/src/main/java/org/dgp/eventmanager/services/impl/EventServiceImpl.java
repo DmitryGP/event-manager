@@ -125,4 +125,11 @@ public class EventServiceImpl implements EventService {
 
         return mapper.map(savedEvent);
     }
+
+    @Override
+    public List<EventDto> findAllActual() {
+        var events = repository.findByStartDateTimeMoreThanDate(ZonedDateTime.now());
+
+        return events.stream().map(mapper::map).toList();
+    }
 }

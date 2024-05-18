@@ -18,4 +18,6 @@ public interface EventService {
     EventDto addParticipant(long eventId, long participantId);
 
     EventDto editEvent(EditEventDto event);
+
+    List<EventDto> findAllActual();
 }
