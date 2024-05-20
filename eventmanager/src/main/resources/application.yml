@@ -1,3 +1,6 @@
+application:
+  kafka:
+    edit-event-notification-topic: "edit-event-notification-topic"
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5430/event_manager

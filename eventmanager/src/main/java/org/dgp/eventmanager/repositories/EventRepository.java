@@ -14,6 +14,5 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("SELECT e FROM Event e, IN(e.participants) p WHERE p.id = :participantId")
     List<Event> findAllByParticipant(long participantId);
 
-    @Query("SELECT e FROM Event e WHERE e.startDateTime > :date")
-    List<Event> findByStartDateTimeMoreThanDate(ZonedDateTime date);
+    List<Event> findByStartDateTimeGreaterThan(ZonedDateTime date);
 }

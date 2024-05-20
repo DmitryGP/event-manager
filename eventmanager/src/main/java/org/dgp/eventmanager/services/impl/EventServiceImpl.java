@@ -10,6 +10,7 @@ import org.dgp.eventmanager.exceptions.NotFoundException;
 import org.dgp.eventmanager.mappers.EventMapper;
 import org.dgp.eventmanager.repositories.EventRepository;
 import org.dgp.eventmanager.repositories.ParticipantRepository;
+import org.dgp.eventmanager.services.EditEventNotificationSender;
 import org.dgp.eventmanager.services.EventService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,8 @@ public class EventServiceImpl implements EventService {
     private final EventMapper mapper;
 
     private final ParticipantRepository participantRepository;
+
+    private final EditEventNotificationSender editEventNotificationSender;
     @Override
     @Transactional
     public EventDto create(CreateEventDto event) {
@@ -121,14 +124,16 @@ public class EventServiceImpl implements EventService {
             event.setEndDateTime(editEvent.getEndDateTime());
         }
 
-        var savedEvent = repository.save(event);
+        var savedEvent = mapper.map(repository.save(event));
 
-        return mapper.map(savedEvent);
+        editEventNotificationSender.send(savedEvent);
+
+        return savedEvent;
     }
 
     @Override
     public List<EventDto> findAllActual() {
-        var events = repository.findByStartDateTimeMoreThanDate(ZonedDateTime.now());
+        var events = repository.findByStartDateTimeGreaterThan(ZonedDateTime.now());
 
         return events.stream().map(mapper::map).toList();
     }

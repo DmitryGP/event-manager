@@ -41,8 +41,8 @@ public class EventRepositoryTest extends JpaRepositoryBaseTest {
 
     @Test
     @Sql(scripts = {"/scripts/drop_data.sql", "/scripts/test_data.sql"})
-    void findAllByStartDateTimeMoreThanNow() {
-        var actual = repository.findByStartDateTimeMoreThanDate(ZonedDateTime.of(2024, 4, 1,
+    void findAllByStartDateTimeMoreThan() {
+        var actual = repository.findByStartDateTimeGreaterThan(ZonedDateTime.of(2024, 4, 1,
                 0, 0, 0, 0, ZoneId.systemDefault()));
 
         assertThat(actual.size()).isEqualTo(2);
