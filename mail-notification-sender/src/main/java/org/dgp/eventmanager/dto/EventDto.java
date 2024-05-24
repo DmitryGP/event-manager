@@ -2,7 +2,6 @@ package org.dgp.eventmanager.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -39,15 +38,11 @@ public class EventDto {
     private PlaceDto place;
 
     @NotNull
-    @JsonFormat(/*with = JsonFormat.Feature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE,*/
-            shape = JsonFormat.Shape.STRING,
-            pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
     private ZonedDateTime startDateTime;
 
     @NotNull
-    @JsonFormat(/*with = JsonFormat.Feature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE,*/
-            shape = JsonFormat.Shape.STRING,
-            pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
     private ZonedDateTime endDateTime;
 
     @NotNull

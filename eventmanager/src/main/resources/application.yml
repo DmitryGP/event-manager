@@ -1,6 +1,13 @@
+server:
+  port: 8080
+
 application:
   kafka:
     edit-event-notification-topic: "edit-event-notification-topic"
+  scheduler:
+    enabled: true
+    cron: 0 0 0 * * *
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5430/event_manager
@@ -11,6 +18,10 @@ spring:
     url: jdbc:postgresql://localhost:5430/event_manager
     user: usr
     password: pwd
+  kafka:
+    producer:
+      bootstrap-servers: "127.0.0.1:9092"
+      client-id: "event-notification-producer"
 
   jpa:
     generate-ddl: false
@@ -26,4 +37,4 @@ spring:
 
 logging:
   level:
-    ROOT: ERROR
+    ROOT: INFO

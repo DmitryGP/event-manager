@@ -1,0 +1,19 @@
+server:
+  port: 8081
+application:
+  kafka:
+    edit-event-notification-topic: "edit-event-notification-topic"
+
+spring:
+  kafka:
+    consumer:
+      group-id: "mail-group"
+      bootstrap-servers: "localhost:9092"
+      client-id: "event-notification-consumer"
+      auto-offset-reset: earliest
+      properties:
+        spring.json.trusted.packages: "org.dgp.eventmanager.external"
+
+logging:
+  level:
+    ROOT: INFO

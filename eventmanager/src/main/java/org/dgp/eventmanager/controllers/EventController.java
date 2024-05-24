@@ -31,13 +31,13 @@ public class EventController {
 
     @GetMapping
     public ResponseEntity<List<EventDto>> getEvents(
-            @RequestParam(required = false) long ownerId,
-            @RequestParam(required = false) long participantId) {
-        if(ownerId != 0) {
+            @RequestParam(required = false) Long ownerId,
+            @RequestParam(required = false) Long participantId) {
+        if(ownerId != null) {
             return ResponseEntity.ok(eventService.findOwnedEvents(ownerId));
         }
 
-        if(participantId != 0) {
+        if(participantId != null) {
             return ResponseEntity.ok(eventService.findParticipatedEvents(participantId));
         }
 
@@ -45,7 +45,7 @@ public class EventController {
     }
 
     @GetMapping("/{eventId}")
-    public ResponseEntity<EventDto> getEvent(@PathVariable long eventId) {
+    public ResponseEntity<EventDto> getEvent(@PathVariable Long eventId) {
         return ResponseEntity.ok(eventService.find(eventId));
     }
 
@@ -55,7 +55,7 @@ public class EventController {
     }
 
     @PutMapping("/{eventId}/{participantId}")
-    public ResponseEntity<EventDto> addParticipant(@PathVariable long eventId, @PathVariable long participantId) {
+    public ResponseEntity<EventDto> addParticipant(@PathVariable Long eventId, @PathVariable Long participantId) {
         return ResponseEntity.ok(eventService.addParticipant(eventId, participantId));
     }
 }

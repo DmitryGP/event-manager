@@ -18,6 +18,10 @@ import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.JacksonUtils;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
+import static org.apache.kafka.clients.producer.ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG;
+import static org.apache.kafka.clients.producer.ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG;
+import static org.springframework.kafka.support.serializer.JsonSerializer.TYPE_MAPPINGS;
+
 @Configuration
 public class KafkaConfiguration {
 
@@ -33,20 +37,21 @@ public class KafkaConfiguration {
     }
 
     @Bean
-    public ProducerFactory<String, EditEventMessage> producerFactory(
+    public ProducerFactory<String, Object> producerFactory(
             KafkaProperties kafkaProperties, ObjectMapper mapper) {
         var props = kafkaProperties.buildProducerProperties(null);
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-
-        var kafkaProducerFactory = new DefaultKafkaProducerFactory<String, EditEventMessage>(props);
+        props.put(KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        props.put(VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        props.put(TYPE_MAPPINGS, "editNotification:org.dgp.eventmanager.external.EditEventMessage," +
+                "nearestEventNotification:org.dgp.eventmanager.external.NearestEventsNotificationMessage");
+        var kafkaProducerFactory = new DefaultKafkaProducerFactory<String, Object>(props);
         kafkaProducerFactory.setValueSerializer(new JsonSerializer<>(mapper));
         return kafkaProducerFactory;
     }
 
     @Bean
-    public KafkaTemplate<String, EditEventMessage> kafkaTemplate(
-            ProducerFactory<String, EditEventMessage> producerFactory) {
+    public KafkaTemplate<String, Object> kafkaTemplate(
+            ProducerFactory<String, Object> producerFactory) {
         return new KafkaTemplate<>(producerFactory);
     }
 
@@ -62,7 +67,7 @@ public class KafkaConfiguration {
     @Bean
     public EditEventNotificationSender editEventNotificationSender(
             NewTopic topic,
-            KafkaTemplate<String, EditEventMessage> kafkaTemplate) {
+            KafkaTemplate<String, Object> kafkaTemplate) {
 
         return new EditEventNotificationSenderKafkaImpl(topic.name(), kafkaTemplate);
     }

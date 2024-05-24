@@ -11,13 +11,14 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.1</version>
+        <version>3.2.5</version>
     </parent>
 
     <packaging>pom</packaging>
 
     <modules>
         <module>eventmanager</module>
+        <module>mail-notification-sender</module>
     </modules>
 
     <properties>
@@ -28,7 +29,7 @@
         <maven-assembly-plugin.version>3.1.1</maven-assembly-plugin.version>
         <minimal.maven.version>3.3.9</minimal.maven.version>
         <dependencyManagement.version>1.0.12.RELEASE</dependencyManagement.version>
-        <springframeworkBoot.version>3.0.5</springframeworkBoot.version>
+        <springframeworkBoot.version>3.2.5</springframeworkBoot.version>
         <jsr305.version>3.0.2</jsr305.version>
     </properties>
 
@@ -44,7 +45,7 @@
             <dependency>
                 <groupId>com.google.code.findbugs</groupId>
                 <artifactId>jsr305</artifactId>
-                <version>${jsr305.version}</version>
+                <!--<version>${jsr305.version}</version>-->
             </dependency>
 
         </dependencies>

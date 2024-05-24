@@ -15,4 +15,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findAllByParticipant(long participantId);
 
     List<Event> findByStartDateTimeGreaterThan(ZonedDateTime date);
+
+    List<Event> findByStartDateTime(ZonedDateTime date);
 }

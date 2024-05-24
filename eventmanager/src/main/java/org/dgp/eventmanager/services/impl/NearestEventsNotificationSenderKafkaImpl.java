@@ -3,33 +3,33 @@ package org.dgp.eventmanager.services.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dgp.eventmanager.dto.EventDto;
-import org.dgp.eventmanager.external.EditEventMessage;
-import org.dgp.eventmanager.services.EditEventNotificationSender;
+import org.dgp.eventmanager.external.NearestEventsNotificationMessage;
+import org.dgp.eventmanager.services.NearestEventsNotificationSender;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
-//@Service
 @RequiredArgsConstructor
-public class EditEventNotificationSenderKafkaImpl implements EditEventNotificationSender {
+@Service
+public class NearestEventsNotificationSenderKafkaImpl implements NearestEventsNotificationSender {
 
     private final String topicName;
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Override
-    public void send(EventDto event) {
+    public void send(List<EventDto> events) {
         log.atInfo()
-                .setMessage("Sending edit event [id = {}] notification.")
-                .addArgument(event.getId())
+                .setMessage("Sending nearest events notification.")
                 .log();
 
-        kafkaTemplate.send(topicName, new EditEventMessage(event))
+        kafkaTemplate.send(topicName, new NearestEventsNotificationMessage(events))
                 .whenComplete((result, e) -> {
                     if(e == null) {
                         log.atInfo()
-                                .setMessage("Edit notification for event id = {} was sent.")
-                                .addArgument(event.getId())
+                                .setMessage("Nearest events notification was sent.")
                                 .log();
                     } else {
                         log.atError()
@@ -37,8 +37,7 @@ public class EditEventNotificationSenderKafkaImpl implements EditEventNotificati
                                 .addArgument(e.getMessage())
                                 .setCause(e)
                                 .log();
-
                     }
-                        });
+                });
     }
 }
