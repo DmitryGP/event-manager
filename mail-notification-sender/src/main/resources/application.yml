@@ -18,8 +18,8 @@ spring:
   mail:
     host: smtp.yandex.ru
     port: 465
-    username: dimgeo@yandex.ru
-    password: mhebkqgcftrvvfmu
+    username:
+    password:
     debug: true
 
 
