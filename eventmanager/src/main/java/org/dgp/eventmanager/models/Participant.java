@@ -37,7 +37,7 @@ public class Participant {
     @Column(name = "email")
     private String email;
 
-    @Column(name = "phoneNumber")
+    @Column(name = "phone_number")
     private String phoneNumber;
 
     @ManyToMany(mappedBy = "participants", fetch = FetchType.LAZY)

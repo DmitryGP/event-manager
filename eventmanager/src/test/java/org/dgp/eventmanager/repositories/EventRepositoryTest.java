@@ -6,8 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,8 +41,7 @@ public class EventRepositoryTest extends JpaRepositoryBaseTest {
     @Test
     @Sql(scripts = {"/scripts/drop_data.sql", "/scripts/test_data.sql"})
     void findAllByStartDateTimeMoreThan() {
-        var actual = repository.findByStartDateTimeGreaterThan(ZonedDateTime.of(2024, 4, 1,
-                0, 0, 0, 0, ZoneId.systemDefault()));
+        var actual = repository.findByStartDateGreaterThan(LocalDate.of(2024, 4, 1));
 
         assertThat(actual.size()).isEqualTo(2);
     }

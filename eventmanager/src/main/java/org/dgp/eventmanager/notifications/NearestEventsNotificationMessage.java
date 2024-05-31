@@ -1,4 +1,4 @@
-package org.dgp.eventmanager.external;
+package org.dgp.eventmanager.notifications;
 
 import lombok.Getter;
 import lombok.Setter;

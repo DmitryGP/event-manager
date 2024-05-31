@@ -5,17 +5,14 @@ import org.dgp.eventmanager.dto.EditEventDto;
 import org.dgp.eventmanager.dto.EventDto;
 import org.dgp.eventmanager.dto.OwnerDto;
 import org.dgp.eventmanager.dto.ParticipantDto;
-import org.dgp.eventmanager.dto.PlaceDto;
 import org.dgp.eventmanager.exceptions.LogicException;
 import org.dgp.eventmanager.exceptions.NotFoundException;
 import org.dgp.eventmanager.models.Event;
 import org.dgp.eventmanager.models.Owner;
 import org.dgp.eventmanager.models.Participant;
-import org.dgp.eventmanager.models.Place;
 import org.dgp.eventmanager.repositories.EventRepository;
 import org.dgp.eventmanager.repositories.OwnerRepository;
 import org.dgp.eventmanager.repositories.ParticipantRepository;
-import org.dgp.eventmanager.repositories.PlaceRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
@@ -25,7 +22,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -51,14 +49,17 @@ public class EventServiceTest {
     private OwnerRepository ownerRepository;
 
     @MockBean
-    private PlaceRepository placeRepository;
+    private ParticipantRepository participantRepository;
 
     @MockBean
-    private ParticipantRepository participantRepository;
+    private EditEventNotificationSender editEventNotificationSender;
+
+    @MockBean
+    private NearestEventsNotificationSender nearestEventsNotificationSender;
 
     private InOrder inOrderEventRepository;
 
-    private final static ZonedDateTime now = ZonedDateTime.now();
+    private final static LocalDate now = LocalDate.now();
 
     private static CreateEventDto createDto;
 
@@ -161,9 +162,12 @@ public class EventServiceTest {
         createDto = CreateEventDto.builder()
                 .name("new event")
                 .description("super event")
-                .startDateTime(now.plusDays(10))
-                .endDateTime(now.plusDays(12))
+                .startDate(now.plusDays(10))
+                .startTime(LocalTime.of(10, 0))
+                .endDate(now.plusDays(12))
+                .endTime(LocalTime.of(20, 0))
                 .maxParticipantsCount(3)
+                .address("address1")
                 .owner(OwnerDto.builder()
                         .id(1)
                         .name("Alex")
@@ -171,31 +175,24 @@ public class EventServiceTest {
                         .email("AlexFirst@host.org")
                         .phoneNumber("+7 (111) 222-3344")
                         .build())
-                .place(PlaceDto.builder()
-                        .id(1)
-                        .name("place1")
-                        .address("address1")
-                        .build())
                 .build();
 
         newEvent = Event.builder()
                 .id(1)
                 .name("new event")
                 .description("super event")
-                .startDateTime(now.plusDays(10))
-                .endDateTime(now.plusDays(12))
+                .startDate(now.plusDays(10))
+                .startTime(LocalTime.of(10, 0))
+                .endDate(now.plusDays(12))
+                .endTime(LocalTime.of(20, 0))
                 .maxParticipantsCount(3)
+                .address("address1")
                 .owner(Owner.builder()
                         .id(1)
                         .name("Alex")
                         .surname("First")
                         .email("AlexFirst@host.org")
                         .phoneNumber("+7 (111) 222-3344")
-                        .build())
-                .place(Place.builder()
-                        .id(1)
-                        .name("place1")
-                        .address("address1")
                         .build())
                 .participants(new ArrayList<>())
                 .build();
@@ -204,20 +201,18 @@ public class EventServiceTest {
                 .id(1)
                 .name("new event")
                 .description("super event")
-                .startDateTime(now.plusDays(10))
-                .endDateTime(now.plusDays(12))
+                .startDate(now.plusDays(10))
+                .startTime(LocalTime.of(10, 0))
+                .endDate(now.plusDays(12))
+                .endTime(LocalTime.of(20, 0))
                 .maxParticipantsCount(3)
+                .address("address1")
                 .owner(OwnerDto.builder()
                         .id(1)
                         .name("Alex")
                         .surname("First")
                         .email("AlexFirst@host.org")
                         .phoneNumber("+7 (111) 222-3344")
-                        .build())
-                .place(PlaceDto.builder()
-                        .id(1)
-                        .name("place1")
-                        .address("address1")
                         .build())
                 .participants(new ArrayList<>())
                 .build();
@@ -226,20 +221,18 @@ public class EventServiceTest {
                 .id(2)
                 .name("second event")
                 .description("just event")
-                .startDateTime(now.plusDays(20))
-                .endDateTime(now.plusDays(22))
+                .startDate(now.plusDays(20))
+                .startTime(LocalTime.of(10, 0))
+                .endDate(now.plusDays(22))
+                .endTime(LocalTime.of(20, 0))
                 .maxParticipantsCount(2)
+                .address("address1")
                 .owner(Owner.builder()
                         .id(1)
                         .name("Alex")
                         .surname("First")
                         .email("AlexFirst@host.org")
                         .phoneNumber("+7 (111) 222-3344")
-                        .build())
-                .place(Place.builder()
-                        .id(1)
-                        .name("place1")
-                        .address("address1")
                         .build())
                 .participants(new ArrayList<>())
                 .build();
@@ -257,20 +250,18 @@ public class EventServiceTest {
                 .id(2)
                 .name("second event")
                 .description("just event")
-                .startDateTime(now.plusDays(20))
-                .endDateTime(now.plusDays(22))
+                .startDate(now.plusDays(20))
+                .startTime(LocalTime.of(10, 0))
+                .endDate(now.plusDays(22))
+                .endTime(LocalTime.of(20, 0))
                 .maxParticipantsCount(2)
+                .address("address1")
                 .owner(OwnerDto.builder()
                         .id(1)
                         .name("Alex")
                         .surname("First")
                         .email("AlexFirst@host.org")
                         .phoneNumber("+7 (111) 222-3344")
-                        .build())
-                .place(PlaceDto.builder()
-                        .id(1)
-                        .name("place1")
-                        .address("address1")
                         .build())
                 .participants(List.of(ParticipantDto.builder()
                         .id(1)
@@ -285,20 +276,18 @@ public class EventServiceTest {
                 .id(3)
                 .name("event")
                 .description("just event")
-                .startDateTime(now.plusDays(20))
-                .endDateTime(now.plusDays(22))
+                .startDate(now.plusDays(20))
+                .startTime(LocalTime.of(10, 0))
+                .endDate(now.plusDays(22))
+                .endTime(LocalTime.of(20, 0))
                 .maxParticipantsCount(1)
+                .address("address1")
                 .owner(Owner.builder()
                         .id(1)
                         .name("Alex")
                         .surname("First")
                         .email("AlexFirst@host.org")
                         .phoneNumber("+7 (111) 222-3344")
-                        .build())
-                .place(Place.builder()
-                        .id(1)
-                        .name("place1")
-                        .address("address1")
                         .build())
                 .participants(new ArrayList<>(List.of(firstParticipant)))
                 .build();
@@ -315,28 +304,28 @@ public class EventServiceTest {
                 .id(2L)
                 .name("new-new")
                 .description("more information")
-                .startDateTime(now.plusDays(30))
-                .endDateTime(now.plusDays(35))
+                .startDate(now.plusDays(30))
+                .startTime(LocalTime.of(11, 0))
+                .endDate(now.plusDays(35))
+                .endTime(LocalTime.of(21, 0))
                 .build();
 
         expectedEditedEvent = EventDto.builder()
                 .id(2)
                 .name("new-new")
                 .description("more information")
-                .startDateTime(now.plusDays(30))
-                .endDateTime(now.plusDays(35))
+                .startDate(now.plusDays(30))
+                .startTime(LocalTime.of(11, 0))
+                .endDate(now.plusDays(35))
+                .endTime(LocalTime.of(21, 0))
                 .maxParticipantsCount(2)
+                .address("address1")
                 .owner(OwnerDto.builder()
                         .id(1)
                         .name("Alex")
                         .surname("First")
                         .email("AlexFirst@host.org")
                         .phoneNumber("+7 (111) 222-3344")
-                        .build())
-                .place(PlaceDto.builder()
-                        .id(1)
-                        .name("place1")
-                        .address("address1")
                         .build())
                 .participants(new ArrayList<>())
                 .build();

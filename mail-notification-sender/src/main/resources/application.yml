@@ -3,6 +3,8 @@ server:
 application:
   kafka:
     edit-event-notification-topic: "edit-event-notification-topic"
+    nearest-events-notification-topic: "nearest-events-notification-topic"
+  mock-mail-service-enabled: true
 
 spring:
   kafka:
@@ -12,7 +14,14 @@ spring:
       client-id: "event-notification-consumer"
       auto-offset-reset: earliest
       properties:
-        spring.json.trusted.packages: "org.dgp.eventmanager.external"
+        spring.json.trusted.packages: "org.dgp.eventmanager.notifications"
+  mail:
+    host: smtp.yandex.ru
+    port: 465
+    username: dimgeo@yandex.ru
+    password: mhebkqgcftrvvfmu
+    debug: true
+
 
 logging:
   level:

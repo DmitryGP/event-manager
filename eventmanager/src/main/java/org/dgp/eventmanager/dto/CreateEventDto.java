@@ -12,6 +12,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 
 @AllArgsConstructor
@@ -30,15 +32,21 @@ public class CreateEventDto {
     private String description;
 
     @NotNull
-    private PlaceDto place;
+    private String address;
 
     @NotNull
     @Future
-    private ZonedDateTime startDateTime;
+    private LocalDate startDate;
+
+    @NotNull
+    private LocalTime startTime;
 
     @NotNull
     @Future
-    private ZonedDateTime endDateTime;
+    private LocalDate endDate;
+
+    @NotNull
+    private LocalTime endTime;
 
     @NotNull
     @Valid

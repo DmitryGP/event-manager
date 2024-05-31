@@ -3,10 +3,9 @@ package org.dgp.eventmanager.services.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dgp.eventmanager.dto.EventDto;
-import org.dgp.eventmanager.external.EditEventMessage;
+import org.dgp.eventmanager.notifications.EditEventMessage;
 import org.dgp.eventmanager.services.EditEventNotificationSender;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.stereotype.Service;
 
 @Slf4j
 //@Service
@@ -15,7 +14,7 @@ public class EditEventNotificationSenderKafkaImpl implements EditEventNotificati
 
     private final String topicName;
 
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final KafkaTemplate<String, EditEventMessage> kafkaTemplate;
 
     @Override
     public void send(EventDto event) {

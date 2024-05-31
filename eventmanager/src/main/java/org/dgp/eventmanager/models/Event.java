@@ -18,7 +18,8 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @NoArgsConstructor
@@ -40,22 +41,27 @@ public class Event {
     @Column(name = "description")
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "place_id")
-    private Place place;
+    @Column(name = "address")
+    private String address;
 
-    @Column(name = "startDateTime")
-    private ZonedDateTime startDateTime;
+    @Column(name = "start_date")
+    private LocalDate startDate;
 
-    @Column(name = "endDateTime")
-    private ZonedDateTime endDateTime;
+    @Column(name = "start_time")
+    private LocalTime startTime;
+
+    @Column(name = "end_date")
+    private LocalDate endDate;
+
+    @Column(name = "end_time")
+    private LocalTime endTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Owner owner;
 
-    @Column(name = "maxParticipantsCount")
+    @Column(name = "max_participants_count")
     private int maxParticipantsCount;
 
     @ManyToMany(fetch = FetchType.LAZY)

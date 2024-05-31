@@ -4,9 +4,10 @@ server:
 application:
   kafka:
     edit-event-notification-topic: "edit-event-notification-topic"
+    nearest-events-notification-topic: "nearest-events-notification-topic"
   scheduler:
     enabled: true
-    cron: 0 0 0 * * *
+    cron: 5 * * * * *
 
 spring:
   datasource:

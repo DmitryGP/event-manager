@@ -13,6 +13,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -36,19 +38,31 @@ public class EventDto {
     private String description;
 
     @NotNull
-    private PlaceDto place;
+    private String address;
 
     @NotNull
     @JsonFormat(/*with = JsonFormat.Feature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE,*/
             shape = JsonFormat.Shape.STRING,
-            pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-    private ZonedDateTime startDateTime;
+            pattern = "yyyy-MM-dd")
+    private LocalDate startDate;
 
     @NotNull
     @JsonFormat(/*with = JsonFormat.Feature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE,*/
             shape = JsonFormat.Shape.STRING,
-            pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-    private ZonedDateTime endDateTime;
+            pattern = "HH:mm:ss")
+    private LocalTime startTime;
+
+    @NotNull
+    @JsonFormat(/*with = JsonFormat.Feature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE,*/
+            shape = JsonFormat.Shape.STRING,
+            pattern = "yyyy-MM-dd")
+    private LocalDate endDate;
+
+    @NotNull
+    @JsonFormat(/*with = JsonFormat.Feature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE,*/
+            shape = JsonFormat.Shape.STRING,
+            pattern = "HH:mm:ss")
+    private LocalTime endTime;
 
     @NotNull
     @Valid

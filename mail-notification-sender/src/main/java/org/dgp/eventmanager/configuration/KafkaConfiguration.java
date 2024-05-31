@@ -11,20 +11,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.CommonErrorHandler;
+import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.support.JacksonUtils;
-import org.springframework.kafka.support.converter.RecordMessageConverter;
-import org.springframework.kafka.support.converter.StringJsonMessageConverter;
-import org.springframework.kafka.support.mapping.DefaultJackson2JavaTypeMapper;
-import org.springframework.kafka.support.mapping.Jackson2JavaTypeMapper;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
 
 import static org.apache.kafka.clients.consumer.ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG;
@@ -34,10 +31,15 @@ import static org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZE
 @Configuration
 public class KafkaConfiguration {
 
-    public final String topicName;
+    public final String editEventNotificationTopicName;
 
-    public KafkaConfiguration(@Value("${application.kafka.edit-event-notification-topic}")String topicName) {
-        this.topicName = topicName;
+    public final String nearestEventsNotificationTopicName;
+
+    public KafkaConfiguration(
+            @Value("${application.kafka.edit-event-notification-topic}")String editEventNotificationTopicName,
+            @Value("${application.kafka.nearest-events-notification-topic}")String nearestEventsNotificationTopicName) {
+        this.editEventNotificationTopicName = editEventNotificationTopicName;
+        this.nearestEventsNotificationTopicName = nearestEventsNotificationTopicName;
     }
 
     @Bean
@@ -46,69 +48,45 @@ public class KafkaConfiguration {
     }
 
     @Bean
-    public RecordMessageConverter multiTypeConverter() {
-        StringJsonMessageConverter converter = new StringJsonMessageConverter();
-        DefaultJackson2JavaTypeMapper typeMapper = new DefaultJackson2JavaTypeMapper();
+    public SimpleAsyncTaskExecutor executor() {
+        var executor = new SimpleAsyncTaskExecutor("k-consumer-");
+        executor.setConcurrencyLimit(10);
 
-        typeMapper.setTypePrecedence(Jackson2JavaTypeMapper.TypePrecedence.TYPE_ID);
-        typeMapper.addTrustedPackages("org.dgp.eventmanager.notifications");
-
-        Map<String, Class<?>> mappings = new HashMap<>();
-        mappings.put("editNotification", EditEventMessage.class);
-        mappings.put("nearestEventNotification", NearestEventsNotificationMessage.class);
-
-        typeMapper.setIdClassMapping(mappings);
-        converter.setTypeMapper(typeMapper);
-
-        return converter;
+        return executor;
     }
 
     @Bean
-    public ConsumerFactory<String, Object> consumerFactory(
+    public ConsumerFactory<String, EditEventMessage> editEventMessageConsumerFactory(
             KafkaProperties kafkaProperties) {
         var props = kafkaProperties.buildConsumerProperties(null);
         props.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        /*props.put(TYPE_MAPPINGS,
-                "editNotification:org.dgp.eventmanager.notifications.EditEventMessage");*/
-        props.put(MAX_POLL_RECORDS_CONFIG, 3);
+        props.put(MAX_POLL_RECORDS_CONFIG, 1);
         props.put(MAX_POLL_INTERVAL_MS_CONFIG, 3_000);
 
-        return new DefaultKafkaConsumerFactory<>(props);
+        return new DefaultKafkaConsumerFactory<>(
+                props,
+                new StringDeserializer(),
+                new JsonDeserializer<>(EditEventMessage.class));
     }
 
-    @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, Object>
-                    multiTypeKafkaListenerContainerFactory(KafkaProperties kafkaProperties) {
-        ConcurrentKafkaListenerContainerFactory<String, Object> factory =
-                new ConcurrentKafkaListenerContainerFactory<>();
-
-        factory.setConsumerFactory(consumerFactory(kafkaProperties));
-        factory.setRecordMessageConverter(multiTypeConverter());
+    @Bean("editEventMessageListenerContainerFactory")
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, EditEventMessage>>
+    editEventMessageListenerContainerFactory(
+            ConsumerFactory<String, EditEventMessage> editEventMessageConsumerFactory,
+            SimpleAsyncTaskExecutor executor) {
+        var factory = new ConcurrentKafkaListenerContainerFactory<String, EditEventMessage>();
+        factory.setConsumerFactory(editEventMessageConsumerFactory);
         factory.setBatchListener(false);
         factory.setConcurrency(1);
         factory.getContainerProperties().setIdleBetweenPolls(1_000);
         factory.getContainerProperties().setPollTimeout(1_000);
 
-        return factory;
-    }
-
-    /*@Bean("listenerContainerFactory")
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, EditEventMessage>>
-    listenerContainerFactory(ConsumerFactory<String, EditEventMessage> consumerFactory) {
-        var factory = new ConcurrentKafkaListenerContainerFactory<String, EditEventMessage>();
-        factory.setConsumerFactory(consumerFactory);
-        factory.setBatchListener(true);
-        factory.setConcurrency(1);
-        factory.getContainerProperties().setIdleBetweenPolls(1_000);
-        factory.getContainerProperties().setPollTimeout(1_000);
-
-        var executor = new SimpleAsyncTaskExecutor("k-consumer-");
-        executor.setConcurrencyLimit(10);
         var listenerTaskExecutor = new ConcurrentTaskExecutor(executor);
         factory.getContainerProperties().setListenerTaskExecutor(listenerTaskExecutor);
+
         return factory;
-    }*/
+    }
 
     @Bean
     public CommonErrorHandler commonErrorHandler() {
@@ -116,12 +94,45 @@ public class KafkaConfiguration {
     }
 
     @Bean
-    public NewTopic topic() {
+    public NewTopic editEventNotificationTopic() {
         return TopicBuilder
-                .name(topicName)
+                .name(editEventNotificationTopicName)
                 .partitions(1)
                 .replicas(1)
                 .build();
+    }
+
+    @Bean
+    public ConsumerFactory<String, NearestEventsNotificationMessage> nearestEventsNotificationMessageConsumerFactory(
+            KafkaProperties kafkaProperties) {
+        var props = kafkaProperties.buildConsumerProperties(null);
+        props.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        props.put(MAX_POLL_RECORDS_CONFIG, 1);
+        props.put(MAX_POLL_INTERVAL_MS_CONFIG, 3_000);
+
+        return new DefaultKafkaConsumerFactory<>(
+                props,
+                new StringDeserializer(),
+                new JsonDeserializer<>(NearestEventsNotificationMessage.class));
+    }
+
+    @Bean("nearestEventsNotificationMessageListenerContainerFactory")
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, NearestEventsNotificationMessage>>
+    nearestEventsNotificationMessageListenerContainerFactory(
+            ConsumerFactory<String, NearestEventsNotificationMessage> nearestEventsNotificationMessageConsumerFactory,
+            SimpleAsyncTaskExecutor executor) {
+        var factory = new ConcurrentKafkaListenerContainerFactory<String, NearestEventsNotificationMessage>();
+        factory.setConsumerFactory(nearestEventsNotificationMessageConsumerFactory);
+        factory.setBatchListener(false);
+        factory.setConcurrency(1);
+        factory.getContainerProperties().setIdleBetweenPolls(1_000);
+        factory.getContainerProperties().setPollTimeout(1_000);
+
+        var listenerTaskExecutor = new ConcurrentTaskExecutor(executor);
+        factory.getContainerProperties().setListenerTaskExecutor(listenerTaskExecutor);
+
+        return factory;
     }
 
     @Bean

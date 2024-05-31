@@ -10,11 +10,13 @@ import org.dgp.eventmanager.exceptions.NotFoundException;
 import org.dgp.eventmanager.mappers.EventMapper;
 import org.dgp.eventmanager.repositories.EventRepository;
 import org.dgp.eventmanager.repositories.ParticipantRepository;
+import org.dgp.eventmanager.services.DateTimeProvider;
 import org.dgp.eventmanager.services.EditEventNotificationSender;
 import org.dgp.eventmanager.services.EventService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -29,6 +31,9 @@ public class EventServiceImpl implements EventService {
     private final ParticipantRepository participantRepository;
 
     private final EditEventNotificationSender editEventNotificationSender;
+
+    private final DateTimeProvider dateTimeProvider;
+
     @Override
     @Transactional
     public EventDto create(CreateEventDto event) {
@@ -108,20 +113,28 @@ public class EventServiceImpl implements EventService {
             event.setDescription(editEvent.getDescription());
         }
 
-        if(editEvent.getStartDateTime() != null) {
-            if(ZonedDateTime.now().isAfter(editEvent.getStartDateTime())) {
+        if(editEvent.getStartDate() != null) {
+            if(LocalDate.now().isAfter(editEvent.getStartDate())) {
                 throw new LogicException("Start date is in the past.");
             }
 
-            event.setStartDateTime(editEvent.getStartDateTime());
+            event.setStartDate(editEvent.getStartDate());
         }
 
-        if(editEvent.getEndDateTime() != null) {
-            if(ZonedDateTime.now().isAfter(editEvent.getEndDateTime())) {
+        if(editEvent.getStartTime() != null) {
+            event.setStartTime(editEvent.getStartTime());
+        }
+
+        if(editEvent.getEndDate() != null) {
+            if(LocalDate.now().isAfter(editEvent.getEndDate())) {
                 throw new LogicException("End date is in the past.");
             }
 
-            event.setEndDateTime(editEvent.getEndDateTime());
+            event.setEndDate(editEvent.getEndDate());
+        }
+
+        if(editEvent.getEndTime() != null) {
+            event.setEndTime(editEvent.getEndTime());
         }
 
         var savedEvent = mapper.map(repository.save(event));
@@ -133,7 +146,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventDto> findAllActual() {
-        var events = repository.findByStartDateTimeGreaterThan(ZonedDateTime.now());
+        var events = repository.findByStartDateGreaterThan(dateTimeProvider.today());
 
         return events.stream().map(mapper::map).toList();
     }
