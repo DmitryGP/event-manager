@@ -17,6 +17,11 @@
 	<properties>
 		<java.version>21</java.version>
 		<mapstruct.version>1.5.5.Final</mapstruct.version>
+		<checkstyle-plugin.version>3.2.2</checkstyle-plugin.version>
+		<checkstyle.config.url>
+			https://raw.githubusercontent.com/OtusTeam/Spring/master/checkstyle.xml
+		</checkstyle.config.url>
+		<checkstyle.version>10.11.0</checkstyle.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -139,6 +144,28 @@
 						</path>
 					</annotationProcessorPaths>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>${checkstyle-plugin.version}</version>
+				<dependencies>
+					<dependency>
+						<groupId>com.puppycrawl.tools</groupId>
+						<artifactId>checkstyle</artifactId>
+						<version>${checkstyle.version}</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<configLocation>${checkstyle.config.url}</configLocation>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
