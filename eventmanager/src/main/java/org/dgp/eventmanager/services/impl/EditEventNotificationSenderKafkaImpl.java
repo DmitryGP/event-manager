@@ -25,7 +25,7 @@ public class EditEventNotificationSenderKafkaImpl implements EditEventNotificati
 
         kafkaTemplate.send(topicName, new EditEventMessage(event))
                 .whenComplete((result, e) -> {
-                    if(e == null) {
+                    if (e == null) {
                         log.atInfo()
                                 .setMessage("Edit notification for event id = {} was sent.")
                                 .addArgument(event.getId())

@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -79,7 +78,7 @@ public class EventServiceImpl implements EventService {
                 .orElseThrow(() ->
                         new NotFoundException("Event with id = %s is not found".formatted(eventId)));
 
-        if(event.getMaxParticipantsCount() <= event.getParticipants().size()) {
+        if (event.getMaxParticipantsCount() <= event.getParticipants().size()) {
             throw new LogicException("Maximum of participant count for event [%s] has been reached."
                     .formatted(event));
         }
@@ -113,27 +112,27 @@ public class EventServiceImpl implements EventService {
             event.setDescription(editEvent.getDescription());
         }
 
-        if(editEvent.getStartDate() != null) {
-            if(LocalDate.now().isAfter(editEvent.getStartDate())) {
+        if (editEvent.getStartDate() != null) {
+            if (LocalDate.now().isAfter(editEvent.getStartDate())) {
                 throw new LogicException("Start date is in the past.");
             }
 
             event.setStartDate(editEvent.getStartDate());
         }
 
-        if(editEvent.getStartTime() != null) {
+        if (editEvent.getStartTime() != null) {
             event.setStartTime(editEvent.getStartTime());
         }
 
-        if(editEvent.getEndDate() != null) {
-            if(LocalDate.now().isAfter(editEvent.getEndDate())) {
+        if (editEvent.getEndDate() != null) {
+            if (LocalDate.now().isAfter(editEvent.getEndDate())) {
                 throw new LogicException("End date is in the past.");
             }
 
             event.setEndDate(editEvent.getEndDate());
         }
 
-        if(editEvent.getEndTime() != null) {
+        if (editEvent.getEndTime() != null) {
             event.setEndTime(editEvent.getEndTime());
         }
 

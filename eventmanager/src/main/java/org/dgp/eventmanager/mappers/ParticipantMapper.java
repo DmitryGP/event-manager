@@ -6,6 +6,8 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface ParticipantMapper {
+
     Participant map(ParticipantDto dto);
+
     ParticipantDto map(Participant participant);
 }

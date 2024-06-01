@@ -26,9 +26,9 @@ import static org.apache.kafka.clients.producer.ProducerConfig.VALUE_SERIALIZER_
 @Configuration
 public class KafkaConfiguration {
 
-    public final String editEventNotificationTopicName;
+    private final String editEventNotificationTopicName;
 
-    public final String nearestEventsNotificationTopicName;
+    private final String nearestEventsNotificationTopicName;
 
     public KafkaConfiguration(
             @Value("${application.kafka.edit-event-notification-topic}") String editEventNotificationTopicName,

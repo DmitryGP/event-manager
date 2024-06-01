@@ -33,11 +33,11 @@ public class EventController {
     public ResponseEntity<List<EventDto>> getEvents(
             @RequestParam(required = false) Long ownerId,
             @RequestParam(required = false) Long participantId) {
-        if(ownerId != null) {
+        if (ownerId != null) {
             return ResponseEntity.ok(eventService.findOwnedEvents(ownerId));
         }
 
-        if(participantId != null) {
+        if (participantId != null) {
             return ResponseEntity.ok(eventService.findParticipatedEvents(participantId));
         }
 

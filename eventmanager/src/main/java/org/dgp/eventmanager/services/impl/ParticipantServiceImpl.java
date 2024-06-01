@@ -16,12 +16,13 @@ public class ParticipantServiceImpl implements ParticipantService {
     private final ParticipantRepository repository;
 
     private final ParticipantMapper mapper;
+
     @Override
     public ParticipantDto create(ParticipantDto participant) {
 
         var existed = repository.findByEmail(participant.getEmail());
 
-        if(existed.isPresent()) {
+        if (existed.isPresent()) {
             throw new AlreadyExistsException(
                     "Event owner with email [%s] is already existed.".formatted(participant.getEmail()));
         }

@@ -25,7 +25,7 @@ public class NearestEventsNotificationSenderKafkaImpl implements NearestEventsNo
 
         kafkaTemplate.send(topicName, new NearestEventsNotificationMessage(events))
                 .whenComplete((result, e) -> {
-                    if(e == null) {
+                    if (e == null) {
                         log.atInfo()
                                 .setMessage("Nearest events notification was sent.")
                                 .log();

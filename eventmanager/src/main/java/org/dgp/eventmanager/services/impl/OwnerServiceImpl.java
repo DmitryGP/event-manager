@@ -24,7 +24,7 @@ public class OwnerServiceImpl implements OwnerService {
 
         var existed = repository.findByEmail(owner.getEmail());
 
-        if(existed.isPresent()) {
+        if (existed.isPresent()) {
             throw new AlreadyExistsException(
                     "Event owner with email [%s] is already existed.".formatted(owner.getEmail()));
         }
