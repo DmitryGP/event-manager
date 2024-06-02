@@ -2,7 +2,6 @@ package org.dgp.eventmanager.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.dgp.eventmanager.services.MailService;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -14,6 +13,7 @@ import org.springframework.stereotype.Service;
 public class MailServiceImpl implements MailService {
 
     private final JavaMailSender mailSender;
+
     @Override
     public void send(String to, String subject, String text) {
         var message = new SimpleMailMessage();

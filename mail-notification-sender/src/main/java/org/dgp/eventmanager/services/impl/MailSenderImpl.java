@@ -69,8 +69,8 @@ public class MailSenderImpl implements MailSender {
         var subject = "Nearest event";
 
         nearestEvents.forEach(e ->
-                e.getParticipants().forEach(p-> {
-                    try{
+                e.getParticipants().forEach(p -> {
+                    try {
                         mailService.send(
                                 p.getEmail(),
                                 subject,

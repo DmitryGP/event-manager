@@ -29,8 +29,8 @@ public class ParticipantController {
         return ResponseEntity.ok(participantService.find(email));
     }
 
-    @GetMapping("/{ownerId}")
-    public ResponseEntity<ParticipantDto> getParticipant(@PathVariable long ownerId) {
-        return ResponseEntity.ok(participantService.find(ownerId));
+    @GetMapping("/{participantId}")
+    public ResponseEntity<ParticipantDto> getParticipant(@PathVariable long participantId) {
+        return ResponseEntity.ok(participantService.find(participantId));
     }
 }

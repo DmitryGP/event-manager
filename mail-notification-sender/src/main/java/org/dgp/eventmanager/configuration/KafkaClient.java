@@ -56,10 +56,10 @@ public class KafkaClient {
     }
 
     private void editEventMessagesProcess(MailSender mailSender) {
-        while(true) {
+        while (true) {
             var message = editEventMessagesQueue.poll();
 
-            if(message != null) {
+            if (message != null) {
                 mailSender.sendEditEventNotification(message.getEvent());
             } else {
                 try {
@@ -72,10 +72,10 @@ public class KafkaClient {
     }
 
     private void nearestEventsNotificationMessagesProcess(MailSender mailSender) {
-        while(true) {
+        while (true) {
             var message = nearestEventsNotificationMessagesQueue.poll();
 
-            if(message != null) {
+            if (message != null) {
                 mailSender.sendNearestEventNotifications(message.getNearestEvents());
             } else {
                 try {

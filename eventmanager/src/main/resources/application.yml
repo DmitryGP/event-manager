@@ -6,7 +6,7 @@ application:
     edit-event-notification-topic: "edit-event-notification-topic"
     nearest-events-notification-topic: "nearest-events-notification-topic"
   scheduler:
-    enabled: true
+    enabled: false
     cron: 5 * * * * *
 
 spring:

@@ -4,8 +4,8 @@ values  ('A', 'AA', 'aaa@host.org', '+7 (111) 456-6787'),
 
 insert into participants(name, surname, email, phone_number)
 values  ('C', 'CC', 'ccc@host.org', '+7 (100) 654-1111'),
-        ('D', 'DD', 'dimgeo@yandex.ru', '+7 (200) 555-2222'),
-        ('E', 'EE', 'dimgeo77@gmail.com', '+7 (300) 641-3333'),
+        ('D', 'DD', 'ddd@host.org', '+7 (200) 555-2222'),
+        ('E', 'EE', 'eee@host.org', '+7 (300) 641-3333'),
         ('F', 'FF', 'fff@host.org', '+7 (500) 333-7777');
 
 insert into events(name, description, owner_id, address, start_date, start_time, end_date, end_time, max_participants_count)

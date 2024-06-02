@@ -31,9 +31,9 @@ import static org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZE
 @Configuration
 public class KafkaConfiguration {
 
-    public final String editEventNotificationTopicName;
+    private final String editEventNotificationTopicName;
 
-    public final String nearestEventsNotificationTopicName;
+    private final String nearestEventsNotificationTopicName;
 
     public KafkaConfiguration(
             @Value("${application.kafka.edit-event-notification-topic}")String editEventNotificationTopicName,
