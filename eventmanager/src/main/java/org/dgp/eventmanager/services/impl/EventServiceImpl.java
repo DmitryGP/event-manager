@@ -8,6 +8,7 @@ import org.dgp.eventmanager.dto.EventDto;
 import org.dgp.eventmanager.exceptions.LogicException;
 import org.dgp.eventmanager.exceptions.NotFoundException;
 import org.dgp.eventmanager.mappers.EventMapper;
+import org.dgp.eventmanager.models.Event;
 import org.dgp.eventmanager.repositories.EventRepository;
 import org.dgp.eventmanager.repositories.ParticipantRepository;
 import org.dgp.eventmanager.services.DateTimeProvider;
@@ -16,7 +17,6 @@ import org.dgp.eventmanager.services.EventService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -102,45 +102,69 @@ public class EventServiceImpl implements EventService {
                 .orElseThrow(() ->
                         new NotFoundException("Event with id = %s is not found".formatted(editEvent.getId())));
 
-        if (editEvent.getName() != null &&
-                Strings.isNotEmpty(editEvent.getName())) {
-            event.setName(editEvent.getName());
-        }
+        updateName(editEvent, event);
 
-        if (editEvent.getDescription() != null &&
-                Strings.isNotEmpty(editEvent.getDescription())) {
-            event.setDescription(editEvent.getDescription());
-        }
+        updateDescription(editEvent, event);
 
-        if (editEvent.getStartDate() != null) {
-            if (LocalDate.now().isAfter(editEvent.getStartDate())) {
-                throw new LogicException("Start date is in the past.");
-            }
+        updateStartDate(editEvent, event);
 
-            event.setStartDate(editEvent.getStartDate());
-        }
+        updateStartTime(editEvent, event);
 
-        if (editEvent.getStartTime() != null) {
-            event.setStartTime(editEvent.getStartTime());
-        }
+        updateEndDate(editEvent, event);
 
-        if (editEvent.getEndDate() != null) {
-            if (LocalDate.now().isAfter(editEvent.getEndDate())) {
-                throw new LogicException("End date is in the past.");
-            }
-
-            event.setEndDate(editEvent.getEndDate());
-        }
-
-        if (editEvent.getEndTime() != null) {
-            event.setEndTime(editEvent.getEndTime());
-        }
+        updateEndTime(editEvent, event);
 
         var savedEvent = mapper.map(repository.save(event));
 
         editEventNotificationSender.send(savedEvent);
 
         return savedEvent;
+    }
+
+    private static void updateEndTime(EditEventDto editEvent, Event event) {
+        if (editEvent.getEndTime() != null) {
+            event.setEndTime(editEvent.getEndTime());
+        }
+    }
+
+    private void updateEndDate(EditEventDto editEvent, Event event) {
+        if (editEvent.getEndDate() != null) {
+            if (dateTimeProvider.today().isAfter(editEvent.getEndDate())) {
+                throw new LogicException("End date is in the past.");
+            }
+
+            event.setEndDate(editEvent.getEndDate());
+        }
+    }
+
+    private static void updateStartTime(EditEventDto editEvent, Event event) {
+        if (editEvent.getStartTime() != null) {
+            event.setStartTime(editEvent.getStartTime());
+        }
+    }
+
+    private void updateStartDate(EditEventDto editEvent, Event event) {
+        if (editEvent.getStartDate() != null) {
+            if (dateTimeProvider.today().isAfter(editEvent.getStartDate())) {
+                throw new LogicException("Start date is in the past.");
+            }
+
+            event.setStartDate(editEvent.getStartDate());
+        }
+    }
+
+    private static void updateDescription(EditEventDto editEvent, Event event) {
+        if (editEvent.getDescription() != null &&
+                Strings.isNotEmpty(editEvent.getDescription())) {
+            event.setDescription(editEvent.getDescription());
+        }
+    }
+
+    private static void updateName(EditEventDto editEvent, Event event) {
+        if (editEvent.getName() != null &&
+                Strings.isNotEmpty(editEvent.getName())) {
+            event.setName(editEvent.getName());
+        }
     }
 
     @Override

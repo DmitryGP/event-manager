@@ -3,6 +3,7 @@ package org.dgp.eventmanager.services.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dgp.eventmanager.dto.EventDto;
+import org.dgp.eventmanager.dto.ParticipantDto;
 import org.dgp.eventmanager.services.MailSender;
 import org.dgp.eventmanager.services.MailService;
 import org.springframework.stereotype.Service;
@@ -30,22 +31,10 @@ public class MailSenderImpl implements MailSender {
 
         event.getParticipants()
                 .forEach(p -> {
-                    try {
-                        mailService.send(
-                                p.getEmail(),
-                                subject,
-                                text.formatted(
-                                        event.getName(),
-                                        event.getStartDate().format(DateTimeFormatter.ISO_DATE),
-                                        event.getStartTime().format(DateTimeFormatter.ISO_LOCAL_TIME)));
-                    } catch (Exception exc) {
-                        log.atError()
-                                .setMessage("Error happened while sending change event mail to {}. {}")
-                                .addArgument(p.getEmail())
-                                .addArgument(exc.toString())
-                                .log();
-                    }
-
+                            sendEditEventMailToParticipant(p, subject,
+                                    text.formatted(event.getName(),
+                                    event.getStartDate().format(DateTimeFormatter.ISO_DATE),
+                                    event.getStartTime().format(DateTimeFormatter.ISO_LOCAL_TIME)));
                         }
                 );
 
@@ -57,12 +46,12 @@ public class MailSenderImpl implements MailSender {
 
     @Override
     public void sendNearestEventNotifications(List<EventDto> nearestEvents) {
+        var eventIdString = nearestEvents.stream().map(EventDto::getId).map(Object::toString)
+                .collect(Collectors.joining(", "));
+
         log.atInfo()
                 .setMessage("Sending nearest event notifications for id(s) = {}")
-                .addArgument(nearestEvents.stream()
-                        .map(EventDto::getId)
-                        .map(Object::toString)
-                        .collect(Collectors.joining(", ")))
+                .addArgument(eventIdString)
                 .log();
 
         var text = "Hi, Inform you about the nearest event.\n%s\nStart at: %s %s";
@@ -70,31 +59,41 @@ public class MailSenderImpl implements MailSender {
 
         nearestEvents.forEach(e ->
                 e.getParticipants().forEach(p -> {
-                    try {
-                        mailService.send(
-                                p.getEmail(),
-                                subject,
-                                text.formatted(
-                                        e.getName(),
-                                        e.getStartDate().format(DateTimeFormatter.ISO_DATE),
-                                        e.getStartTime().format(DateTimeFormatter.ISO_LOCAL_TIME)));
-                    } catch (Exception exc) {
-                        log.atError()
-                                .setMessage("Error happened while sending nearest event mail to {}. {}")
-                                .addArgument(p.getEmail())
-                                .addArgument(exc.toString())
-                                .log();
-                    }
-
+                            sendNearestEventMailToParticipant(p, subject, text.formatted(e.getName(),
+                                    e.getStartDate().format(DateTimeFormatter.ISO_DATE),
+                                    e.getStartTime().format(DateTimeFormatter.ISO_LOCAL_TIME)));
                         }
                         ));
 
         log.atInfo()
                 .setMessage("Nearest event notifications for id(s) = {} was sent")
-                .addArgument(nearestEvents.stream()
-                        .map(EventDto::getId)
-                        .map(Object::toString)
-                        .collect(Collectors.joining(", ")))
+                .addArgument(eventIdString)
                 .log();
+    }
+
+    private void sendNearestEventMailToParticipant(ParticipantDto participant, String subject, String text) {
+        try {
+            mailService.send(participant.getEmail(), subject,
+                    text);
+        } catch (Exception exc) {
+            log.atError()
+                    .setMessage("Error happened while sending nearest event mail to {}. {}")
+                    .addArgument(participant.getEmail())
+                    .addArgument(exc.toString())
+                    .log();
+        }
+    }
+
+    private void sendEditEventMailToParticipant(ParticipantDto participant, String subject, String text) {
+        try {
+            mailService.send(participant.getEmail(), subject,
+                    text);
+        } catch (Exception exc) {
+            log.atError()
+                    .setMessage("Error happened while sending change event mail to {}. {}")
+                    .addArgument(participant.getEmail())
+                    .addArgument(exc.toString())
+                    .log();
+        }
     }
 }
