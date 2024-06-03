@@ -77,17 +77,9 @@ public class EventServiceImpl implements EventService {
                 .orElseThrow(() ->
                         new NotFoundException("Event with id = %s is not found".formatted(eventId)));
 
-        if (event.getMaxParticipantsCount() <= event.getParticipants().size()) {
-            throw new LogicException("Maximum of participant count for event [%s] has been reached."
-                    .formatted(event));
-        }
+        checkMaximumParticipantsCount(event);
 
-        var participantIds = event.getParticipants().stream().map(Participant::getId).toList();
-
-        if (participantIds.contains(participantId)) {
-           throw new LogicException("Participant with id = %s is present on the event."
-                   .formatted(participantId));
-        }
+        checkIfParticipantPresent(participantId, event);
 
         var participant = participantRepository.findById(participantId)
                 .orElseThrow(() ->
@@ -98,6 +90,22 @@ public class EventServiceImpl implements EventService {
         var savedEvent = repository.save(event);
 
         return mapper.map(savedEvent);
+    }
+
+    private static void checkIfParticipantPresent(long participantId, Event event) {
+        var participantIds = event.getParticipants().stream().map(Participant::getId).toList();
+
+        if (participantIds.contains(participantId)) {
+           throw new LogicException("Participant with id = %s is present on the event."
+                   .formatted(participantId));
+        }
+    }
+
+    private static void checkMaximumParticipantsCount(Event event) {
+        if (event.getMaxParticipantsCount() <= event.getParticipants().size()) {
+            throw new LogicException("Maximum of participant count for event [%s] has been reached."
+                    .formatted(event));
+        }
     }
 
     @Override

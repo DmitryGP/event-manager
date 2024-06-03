@@ -6,7 +6,7 @@ application:
     edit-event-notification-topic: "edit-event-notification-topic"
     nearest-events-notification-topic: "nearest-events-notification-topic"
   scheduler:
-    enabled: false
+    enabled: true
     cron: 2 * * * * *
   date-time-mock: true
 
