@@ -9,6 +9,7 @@ import org.dgp.eventmanager.exceptions.LogicException;
 import org.dgp.eventmanager.exceptions.NotFoundException;
 import org.dgp.eventmanager.mappers.EventMapper;
 import org.dgp.eventmanager.models.Event;
+import org.dgp.eventmanager.models.Participant;
 import org.dgp.eventmanager.repositories.EventRepository;
 import org.dgp.eventmanager.repositories.ParticipantRepository;
 import org.dgp.eventmanager.services.DateTimeProvider;
@@ -68,8 +69,6 @@ public class EventServiceImpl implements EventService {
         return events.stream().map(mapper::map).toList();
     }
 
-
-
     @Override
     @Transactional
     public EventDto addParticipant(long eventId, long participantId) {
@@ -81,6 +80,13 @@ public class EventServiceImpl implements EventService {
         if (event.getMaxParticipantsCount() <= event.getParticipants().size()) {
             throw new LogicException("Maximum of participant count for event [%s] has been reached."
                     .formatted(event));
+        }
+
+        var participantIds = event.getParticipants().stream().map(Participant::getId).toList();
+
+        if (participantIds.contains(participantId)) {
+           throw new LogicException("Participant with id = %s is present on the event."
+                   .formatted(participantId));
         }
 
         var participant = participantRepository.findById(participantId)

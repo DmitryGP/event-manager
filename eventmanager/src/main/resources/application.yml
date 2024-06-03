@@ -7,7 +7,8 @@ application:
     nearest-events-notification-topic: "nearest-events-notification-topic"
   scheduler:
     enabled: false
-    cron: 5 * * * * *
+    cron: 2 * * * * *
+  date-time-mock: true
 
 spring:
   datasource:
