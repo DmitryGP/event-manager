@@ -11,6 +11,7 @@ import org.dgp.eventmanager.mappers.EventMapper;
 import org.dgp.eventmanager.models.Event;
 import org.dgp.eventmanager.models.Participant;
 import org.dgp.eventmanager.repositories.EventRepository;
+import org.dgp.eventmanager.repositories.OwnerRepository;
 import org.dgp.eventmanager.repositories.ParticipantRepository;
 import org.dgp.eventmanager.services.DateTimeProvider;
 import org.dgp.eventmanager.services.EditEventNotificationSender;
@@ -30,6 +31,8 @@ public class EventServiceImpl implements EventService {
 
     private final ParticipantRepository participantRepository;
 
+    private final OwnerRepository ownerRepository;
+
     private final EditEventNotificationSender editEventNotificationSender;
 
     private final DateTimeProvider dateTimeProvider;
@@ -38,7 +41,12 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public EventDto create(CreateEventDto event) {
 
+        var owner = ownerRepository.findById(event.getOwnerId()).orElseThrow(() ->
+                        new NotFoundException("Owner with id = %d is not found".formatted(event.getOwnerId())));
+
         var newEvent = mapper.map(event);
+
+        newEvent.setOwner(owner);
 
         var savedEvent = repository.save(newEvent);
 

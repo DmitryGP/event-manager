@@ -49,7 +49,7 @@ public class CreateEventDto {
 
     @NotNull
     @Valid
-    private OwnerDto owner;
+    private long ownerId;
 
     @Min(1)
     private int maxParticipantsCount;

@@ -26,7 +26,7 @@ public abstract class EventMapper {
             ".map(participantMapper::map).toList())")
     public abstract Event map(EventDto event);
 
-    @Mapping(target = "owner", expression = "java(ownerMapper.map(event.getOwner()))")
-    @Mapping(target = "participants", expression = "java(new java.util.ArrayList())")
+    @Mapping(target = "owner", ignore = true)
+    @Mapping(target = "participants", expression = "java(new java.util.ArrayList<>())")
     public abstract Event map(CreateEventDto event);
 }

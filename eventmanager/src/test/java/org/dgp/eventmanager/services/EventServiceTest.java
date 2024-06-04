@@ -91,6 +91,14 @@ public class EventServiceTest {
     void createEvent() {
 
         when(eventRepository.save(any(Event.class))).thenReturn(newEvent);
+        when(ownerRepository.findById(1L)).thenReturn(
+                Optional.ofNullable(Owner.builder()
+                                        .id(1)
+                                        .name("Alex")
+                                        .surname("First")
+                                        .email("AlexFirst@host.org")
+                                        .phoneNumber("+7 (111) 222-3344")
+                                        .build()));
 
         var actual = eventService.create(createDto);
 
@@ -168,13 +176,7 @@ public class EventServiceTest {
                 .endTime(LocalTime.of(20, 0))
                 .maxParticipantsCount(3)
                 .address("address1")
-                .owner(OwnerDto.builder()
-                        .id(1)
-                        .name("Alex")
-                        .surname("First")
-                        .email("AlexFirst@host.org")
-                        .phoneNumber("+7 (111) 222-3344")
-                        .build())
+                .ownerId(1)
                 .build();
 
         newEvent = Event.builder()
