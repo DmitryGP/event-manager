@@ -1,0 +1,42 @@
+server:
+  port: 8080
+
+application:
+  kafka:
+    edit-event-notification-topic: "edit-event-notification-topic"
+    nearest-events-notification-topic: "nearest-events-notification-topic"
+  scheduler:
+    enabled: true
+    cron: 2 * * * * *
+  date-time-mock: true
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5430/event_manager
+    username: usr
+    password: pwd
+    initialization-mode: never
+  flyway:
+    url: jdbc:postgresql://localhost:5430/event_manager
+    user: usr
+    password: pwd
+  kafka:
+    producer:
+      bootstrap-servers: "127.0.0.1:9092"
+      client-id: "event-notification-producer"
+
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+
+    properties:
+      hibernate:
+        format_sql: true
+
+    show-sql: true
+
+
+logging:
+  level:
+    ROOT: INFO
